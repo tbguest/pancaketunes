@@ -1,0 +1,16 @@
+{
+  "id": "the-usual-reels",
+  "name": "The Usual Reels",
+  "description": "The reels that always turn up.",
+  "tuneIds": [
+    "cooleys",
+    "drowsy-maggie"
+  ],
+  "notes": "Straight into Drowsy on the last A part.",
+  "tags": [
+    "reels",
+    "standard"
+  ],
+  "createdAt": "2026-08-02T10:00:00.000Z",
+  "updatedAt": "2026-08-02T10:00:00.000Z"
+}

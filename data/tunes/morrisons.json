@@ -1,0 +1,17 @@
+{
+  "id": "morrisons",
+  "title": "Morrison’s",
+  "alternateTitles": [
+    "Maurice Morrison’s"
+  ],
+  "type": "jig",
+  "key": "Edorian",
+  "notes": "Named for the Sligo fiddler James Morrison.",
+  "tags": [
+    "session",
+    "standard"
+  ],
+  "links": [],
+  "createdAt": "2026-08-02T10:00:00.000Z",
+  "updatedAt": "2026-08-02T10:00:00.000Z"
+}
