@@ -96,6 +96,25 @@ export default async function TunePage({ params }: Params) {
         </section>
       )}
 
+      {tune.accompaniment && (
+        <section>
+          <h3>Accompaniment</h3>
+          <pre
+            className="prose"
+            style={{
+              margin: 0,
+              overflowX: "auto",
+              fontSize: "0.875rem",
+              border: "1px solid var(--line)",
+              borderRadius: "var(--radius)",
+              padding: "0.75rem",
+            }}
+          >
+            {tune.accompaniment}
+          </pre>
+        </section>
+      )}
+
       {tune.tags.length > 0 && (
         <section>
           <h3>Tags</h3>

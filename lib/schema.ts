@@ -39,6 +39,7 @@ export const tuneSchema = z.object({
   tags: z.array(z.string().trim().min(1)).default([]),
   links: z.array(linkSchema).default([]),
   abc: optionalText,
+  accompaniment: optionalText,
   sheetMusicUrl: optionalText.refine(
     (v) => v === undefined || /^https?:\/\//.test(v),
     "Sheet music link must be a full URL (https://...)",

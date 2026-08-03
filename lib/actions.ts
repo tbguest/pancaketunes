@@ -93,6 +93,7 @@ function parseTuneForm(formData: FormData) {
     tags: tagsToArray(formData.get("tags")),
     links: linesToLinks(formData.get("links")),
     abc: String(formData.get("abc") ?? ""),
+    accompaniment: String(formData.get("accompaniment") ?? ""),
     sheetMusicUrl: String(formData.get("sheetMusicUrl") ?? ""),
   };
 }

@@ -152,6 +152,20 @@ export function TuneForm({
         />
       </div>
 
+      <div className="field">
+        <label htmlFor="accompaniment">Accompaniment</label>
+        <span className="hint">Chord progressions, backup patterns, etc.</span>
+        <textarea
+          id="accompaniment"
+          name="accompaniment"
+          className="code"
+          defaultValue={state.values?.accompaniment ?? tune?.accompaniment}
+          rows={6}
+          spellCheck={false}
+          placeholder={"A: G · C · G · D\nB: Em · C · G · D"}
+        />
+      </div>
+
       <div className="actions">
         <SubmitButton>{tune ? "Save changes" : "Add tune"}</SubmitButton>
         <Link href={tune ? `/tunes/${tune.id}` : "/"} className="btn btn-secondary">

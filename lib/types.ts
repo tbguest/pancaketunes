@@ -41,6 +41,7 @@ export type Tune = {
   tags: string[];
   links: Link[];
   abc?: string;
+  accompaniment?: string;
   sheetMusicUrl?: string;
   createdAt: string;
   updatedAt: string;
