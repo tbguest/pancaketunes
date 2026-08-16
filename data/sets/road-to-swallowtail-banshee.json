@@ -1,11 +1,11 @@
 {
   "id": "road-to-swallowtail-banshee",
-  "name": "Swallowtail-Lisdoonvarna-Banshee",
+  "name": "Swallowtail-Lisdoonvarna",
   "tuneIds": [
     "swallowtail",
     "road-to-lisdoonvarna"
   ],
   "tags": [],
   "createdAt": "2026-08-02T17:03:38.642Z",
-  "updatedAt": "2026-08-16T13:56:05.916Z"
+  "updatedAt": "2026-08-16T13:56:40.344Z"
 }
