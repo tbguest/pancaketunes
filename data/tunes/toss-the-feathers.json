@@ -6,8 +6,13 @@
   "key": "D-ish",
   "status": "backlog",
   "tags": [],
-  "links": [],
+  "links": [
+    {
+      "label": "",
+      "url": "https://www.youtube.com/watch?v=5V7SIFAVVyI&list=RD5V7SIFAVVyI&start_radio=1"
+    }
+  ],
   "sheetMusicUrl": "https://thesession.org/tunes/113",
   "createdAt": "2026-08-30T17:31:14.691Z",
-  "updatedAt": "2026-08-30T17:31:14.691Z"
+  "updatedAt": "2026-08-30T17:34:43.173Z"
 }
