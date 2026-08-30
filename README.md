@@ -78,6 +78,11 @@ sets that use it. Files are validated on read (`lib/schema.ts`); anything
 malformed is skipped and reported at the top of the home page rather than
 crashing the site.
 
+A tune carries a `status` of either `repertoire` (the setlist everyone plays)
+or `backlog` (tunes suggested for later — kept on their own tab so the setlist
+stays the setlist). Files written before the field existed read as
+`repertoire`, and a tune moves between the two with one tap on its page.
+
 You can also just edit the JSON in your editor and commit — the app picks it up.
 
 ## Scripts

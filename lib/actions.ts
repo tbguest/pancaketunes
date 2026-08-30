@@ -8,7 +8,7 @@ import { linesToArray, linesToLinks, tagsToArray } from "./form";
 import { formatZodError, setSchema, tuneSchema } from "./schema";
 import { ConflictError, getStorage } from "./storage";
 import { slugify, uniqueSlug } from "./slug";
-import { TUNE_TYPES, type TuneType } from "./types";
+import { TUNE_STATUSES, TUNE_TYPES, type TuneStatus, type TuneType } from "./types";
 
 /**
  * Every mutation funnels through here. The shape is always the same:
@@ -81,6 +81,13 @@ function refreshRoutes() {
 
 // ---------------------------------------------------------------- tunes
 
+function readStatus(formData: FormData): TuneStatus {
+  const status = String(formData.get("status") ?? "");
+  return (TUNE_STATUSES as readonly string[]).includes(status)
+    ? (status as TuneStatus)
+    : "repertoire";
+}
+
 function parseTuneForm(formData: FormData) {
   const type = String(formData.get("type") ?? "");
   return {
@@ -88,6 +95,7 @@ function parseTuneForm(formData: FormData) {
     alternateTitles: linesToArray(formData.get("alternateTitles")),
     type: (TUNE_TYPES as readonly string[]).includes(type) ? (type as TuneType) : "other",
     key: String(formData.get("key") ?? "").trim(),
+    status: readStatus(formData),
     composer: String(formData.get("composer") ?? ""),
     notes: String(formData.get("notes") ?? ""),
     tags: tagsToArray(formData.get("tags")),
@@ -115,7 +123,9 @@ export async function createTune(_prev: FormState, formData: FormData): Promise<
       id,
       serialise(parsed.data),
       undefined,
-      `Add tune: ${parsed.data.title}`,
+      parsed.data.status === "backlog"
+        ? `Add backlog tune: ${parsed.data.title}`
+        : `Add tune: ${parsed.data.title}`,
     );
 
     refreshRoutes();
@@ -167,7 +177,42 @@ export async function deleteTune(_prev: FormState, formData: FormData): Promise<
     await getStorage().remove("tunes", id, existing._sha, `Delete tune: ${existing.title}`);
 
     refreshRoutes();
-    redirect("/");
+    redirect(existing.status === "backlog" ? "/?view=backlog" : "/");
+  });
+}
+
+/**
+ * Move a tune between the setlist and the backlog without opening the editor —
+ * one tap is the whole point, since promoting a tune is what the backlog is for.
+ */
+export async function moveTune(_prev: FormState, formData: FormData): Promise<FormState> {
+  return run(formData, async () => {
+    await requireSession();
+
+    const id = String(formData.get("id") ?? "");
+    const { tunes } = await getDataset();
+    const existing = tunes.find((tune) => tune.id === id);
+    if (!existing) throw new Error("That tune no longer exists.");
+
+    const status = readStatus(formData);
+    const parsed = tuneSchema.safeParse({
+      ...existing,
+      status,
+      updatedAt: new Date().toISOString(),
+    });
+    if (!parsed.success) throw new Error(formatZodError(parsed.error));
+
+    await getStorage().write(
+      "tunes",
+      id,
+      serialise(parsed.data),
+      existing._sha,
+      status === "backlog"
+        ? `Move tune to backlog: ${parsed.data.title}`
+        : `Move tune to repertoire: ${parsed.data.title}`,
+    );
+
+    refreshRoutes();
   });
 }
 

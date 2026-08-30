@@ -25,6 +25,16 @@ export const TUNE_TYPES = [
 
 export type TuneType = (typeof TUNE_TYPES)[number];
 
+/**
+ * Where a tune sits relative to the group. `repertoire` is the shared setlist —
+ * tunes we actually play. `backlog` is a parking spot for tunes someone knows
+ * and would like to teach, so they can be written down without cluttering the
+ * setlist. Records written before this field existed read back as `repertoire`.
+ */
+export const TUNE_STATUSES = ["repertoire", "backlog"] as const;
+
+export type TuneStatus = (typeof TUNE_STATUSES)[number];
+
 export type Link = {
   label: string;
   url: string;
@@ -36,6 +46,7 @@ export type Tune = {
   alternateTitles: string[];
   type: TuneType;
   key: string;
+  status: TuneStatus;
   composer?: string;
   notes?: string;
   tags: string[];

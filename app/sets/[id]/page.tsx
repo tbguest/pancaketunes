@@ -41,7 +41,11 @@ export default async function SetPage({ params }: Params) {
                 <Link href={`/tunes/${tune.id}`} className="item">
                   <div>
                     <div className="title">{tune.title}</div>
-                    <div className="meta">{[tune.type, tune.key].filter(Boolean).join(" · ")}</div>
+                    <div className="meta">
+                      {[tune.type, tune.key, tune.status === "backlog" && "backlog"]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </div>
                   </div>
                 </Link>
               ) : (

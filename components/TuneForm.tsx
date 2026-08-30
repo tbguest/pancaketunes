@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 import type { FormState } from "@/lib/actions";
 import { linksToLines } from "@/lib/form";
-import { TUNE_TYPES, type Stored, type Tune } from "@/lib/types";
+import { TUNE_TYPES, type Stored, type Tune, type TuneStatus } from "@/lib/types";
 import { SubmitButton } from "./SubmitButton";
 
 /**
@@ -18,9 +18,12 @@ import { SubmitButton } from "./SubmitButton";
 export function TuneForm({
   action,
   tune,
+  defaultStatus = "repertoire",
 }: {
   action: (state: FormState, formData: FormData) => Promise<FormState>;
   tune?: Stored<Tune>;
+  /** Preselected on a new tune, so "add to backlog" lands on the right setting. */
+  defaultStatus?: TuneStatus;
 }) {
   const [state, formAction] = useActionState(action, {});
 
@@ -71,6 +74,19 @@ export function TuneForm({
           placeholder="D major, Ador, Em…"
           autoComplete="off"
         />
+      </div>
+
+      <div className="field">
+        <label htmlFor="status">Status</label>
+        <span className="hint">The backlog is for tunes the group hasn’t taken up yet.</span>
+        <select
+          id="status"
+          name="status"
+          defaultValue={state.values?.status ?? tune?.status ?? defaultStatus}
+        >
+          <option value="repertoire">In the setlist</option>
+          <option value="backlog">Backlog</option>
+        </select>
       </div>
 
       <div className="field">

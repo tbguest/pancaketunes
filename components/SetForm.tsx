@@ -158,7 +158,9 @@ export function SetForm({
             {candidates.map((tune) => (
               <li key={tune.id}>
                 <span className="name">{tune.title}</span>
-                <span className="meta">{tune.type}</span>
+                <span className="meta">
+                  {tune.status === "backlog" ? `${tune.type} · backlog` : tune.type}
+                </span>
                 <button
                   type="button"
                   className="icon-btn"

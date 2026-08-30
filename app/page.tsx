@@ -24,7 +24,7 @@ export default async function HomePage({
       <Browser
         tunes={tunes.map(withoutSha)}
         sets={sets.map(withoutSha)}
-        initialView={view === "sets" ? "sets" : "tunes"}
+        initialView={view === "sets" || view === "backlog" ? view : "tunes"}
         canEdit={canEdit}
       />
     </>

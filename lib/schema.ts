@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { TUNE_TYPES } from "./types";
+import { TUNE_STATUSES, TUNE_TYPES } from "./types";
 
 /**
  * Zod is the single source of truth for what a valid record looks like. Both
@@ -34,6 +34,8 @@ export const tuneSchema = z.object({
   alternateTitles: z.array(z.string().trim().min(1)).default([]),
   type: z.enum(TUNE_TYPES),
   key: z.string().trim().default(""),
+  // Absent in files written before the backlog existed, so it defaults in.
+  status: z.enum(TUNE_STATUSES).default("repertoire"),
   composer: optionalText,
   notes: optionalText,
   tags: z.array(z.string().trim().min(1)).default([]),

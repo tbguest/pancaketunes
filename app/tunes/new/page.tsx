@@ -6,13 +6,18 @@ import { requireSignedInPage } from "@/lib/auth/guard";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "New tune · Pancake Tunes" };
 
-export default async function NewTunePage() {
-  await requireSignedInPage("/tunes/new");
+export default async function NewTunePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
+  const [{ status }] = await Promise.all([searchParams, requireSignedInPage("/tunes/new")]);
+  const backlog = status === "backlog";
 
   return (
     <div className="stack">
-      <h2>New tune</h2>
-      <TuneForm action={createTune} />
+      <h2>{backlog ? "New backlog tune" : "New tune"}</h2>
+      <TuneForm action={createTune} defaultStatus={backlog ? "backlog" : "repertoire"} />
     </div>
   );
 }

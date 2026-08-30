@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DeleteButton } from "@/components/DeleteButton";
-import { deleteTune } from "@/lib/actions";
+import { MoveButton } from "@/components/MoveButton";
+import { deleteTune, moveTune } from "@/lib/actions";
 import { isSignedIn } from "@/lib/auth/session";
 import { getSetsContaining, getTune } from "@/lib/data";
 import { linkLabel } from "@/lib/form";
@@ -23,11 +24,12 @@ export default async function TunePage({ params }: Params) {
 
   const inSets = await getSetsContaining(id);
   const summary = [tune.type, tune.key, tune.composer].filter(Boolean).join(" · ");
+  const backlogged = tune.status === "backlog";
 
   return (
     <div className="stack">
-      <Link href="/" className="backlink">
-        ← All tunes
+      <Link href={backlogged ? "/?view=backlog" : "/"} className="backlink">
+        ← {backlogged ? "Backlog" : "All tunes"}
       </Link>
 
       <header className="stack-tight">
@@ -36,6 +38,11 @@ export default async function TunePage({ params }: Params) {
           <p className="meta">aka {tune.alternateTitles.join(" · ")}</p>
         )}
         <p className="meta">{summary}</p>
+        {backlogged && (
+          <p className="meta">
+            <span className="tag">Backlog</span> Not in the setlist yet.
+          </p>
+        )}
       </header>
 
       {tune.notes && (
@@ -146,6 +153,7 @@ export default async function TunePage({ params }: Params) {
       {canEdit && (
         <>
           <hr />
+          <MoveButton action={moveTune} id={tune.id} status={tune.status} />
           <div className="actions">
             <Link href={`/tunes/${tune.id}/edit`} className="btn">
               Edit

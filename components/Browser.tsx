@@ -6,12 +6,16 @@ import { indexSets, indexTunes, search } from "@/lib/search";
 import { TUNE_TYPES, type Tune, type TuneSet, type TuneType } from "@/lib/types";
 
 /**
- * The home screen: one search box, two tabs, one column. All filtering is
+ * The home screen: one search box, three tabs, one column. All filtering is
  * client-side against data embedded in the page, so results update as fast as
  * the user can type.
+ *
+ * The backlog is a third tab rather than a filter chip: it is a different list
+ * with a different purpose (tunes nobody plays yet), and keeping it off the
+ * Tunes tab is the whole reason it exists.
  */
 
-type View = "tunes" | "sets";
+type View = "tunes" | "sets" | "backlog";
 
 type Props = {
   tunes: Tune[];
@@ -28,23 +32,53 @@ export function Browser({ tunes, sets, initialView, canEdit }: Props) {
   // Keeps typing responsive if the list ever gets long enough to matter.
   const deferredQuery = useDeferredValue(query);
 
+  const repertoire = useMemo(() => tunes.filter((tune) => tune.status !== "backlog"), [tunes]);
+  const backlog = useMemo(() => tunes.filter((tune) => tune.status === "backlog"), [tunes]);
+
+  // An empty backlog is worth nobody's attention, so the tab only shows up once
+  // there is something in it — or for someone signed in who can put it there.
+  const showBacklog = backlog.length > 0 || canEdit;
+  const active: View = view === "backlog" && !showBacklog ? "tunes" : view;
+
   const tuneIndex = useMemo(() => indexTunes(tunes), [tunes]);
+  // Sets index against every tune: a planned set may well reach into the backlog.
   const setIndex = useMemo(() => indexSets(sets, tunes), [sets, tunes]);
 
+  // Searching once over everything and splitting afterwards keeps the two tune
+  // tabs in step — the same query, the same ranking, just a different half.
   const matchedTunes = useMemo(() => {
     const found = search(tuneIndex, deferredQuery);
     return type === "all" ? found : found.filter((tune) => tune.type === type);
   }, [tuneIndex, deferredQuery, type]);
 
+  const matchedRepertoire = useMemo(
+    () => matchedTunes.filter((tune) => tune.status !== "backlog"),
+    [matchedTunes],
+  );
+  const matchedBacklog = useMemo(
+    () => matchedTunes.filter((tune) => tune.status === "backlog"),
+    [matchedTunes],
+  );
+
   const matchedSets = useMemo(() => search(setIndex, deferredQuery), [setIndex, deferredQuery]);
 
-  // Only offer filters for types actually present in the repertoire.
-  const availableTypes = useMemo(() => {
-    const present = new Set(tunes.map((tune) => tune.type));
-    return TUNE_TYPES.filter((candidate) => present.has(candidate));
-  }, [tunes]);
+  const listed = active === "backlog" ? backlog : repertoire;
 
-  const showing = view === "tunes" ? matchedTunes.length : matchedSets.length;
+  // Only offer filters for types actually present in the list being shown.
+  const availableTypes = useMemo(() => {
+    const present = new Set(listed.map((tune) => tune.type));
+    return TUNE_TYPES.filter((candidate) => present.has(candidate));
+  }, [listed]);
+
+  // A type chosen on one tab rarely makes sense on another, so switching clears it.
+  function show(next: View) {
+    setView(next);
+    setType("all");
+  }
+
+  const matched =
+    active === "tunes" ? matchedRepertoire : active === "backlog" ? matchedBacklog : matchedSets;
+  const noun = active === "sets" ? "set" : "tune";
 
   return (
     <div className="stack">
@@ -53,8 +87,8 @@ export function Browser({ tunes, sets, initialView, canEdit }: Props) {
         type="search"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        placeholder={view === "tunes" ? "Search tunes…" : "Search sets…"}
-        aria-label={view === "tunes" ? "Search tunes" : "Search sets"}
+        placeholder={`Search ${active === "sets" ? "sets" : active === "backlog" ? "the backlog" : "tunes"}…`}
+        aria-label={`Search ${active === "sets" ? "sets" : active === "backlog" ? "the backlog" : "tunes"}`}
         autoComplete="off"
         autoCorrect="off"
         spellCheck={false}
@@ -65,30 +99,44 @@ export function Browser({ tunes, sets, initialView, canEdit }: Props) {
         <a
           role="tab"
           href="#"
-          aria-current={view === "tunes" ? "page" : undefined}
-          aria-selected={view === "tunes"}
+          aria-current={active === "tunes" ? "page" : undefined}
+          aria-selected={active === "tunes"}
           onClick={(event) => {
             event.preventDefault();
-            setView("tunes");
+            show("tunes");
           }}
         >
-          Tunes ({matchedTunes.length})
+          Tunes ({matchedRepertoire.length})
         </a>
         <a
           role="tab"
           href="#"
-          aria-current={view === "sets" ? "page" : undefined}
-          aria-selected={view === "sets"}
+          aria-current={active === "sets" ? "page" : undefined}
+          aria-selected={active === "sets"}
           onClick={(event) => {
             event.preventDefault();
-            setView("sets");
+            show("sets");
           }}
         >
           Sets ({matchedSets.length})
         </a>
+        {showBacklog && (
+          <a
+            role="tab"
+            href="#"
+            aria-current={active === "backlog" ? "page" : undefined}
+            aria-selected={active === "backlog"}
+            onClick={(event) => {
+              event.preventDefault();
+              show("backlog");
+            }}
+          >
+            Backlog ({matchedBacklog.length})
+          </a>
+        )}
       </div>
 
-      {view === "tunes" && availableTypes.length > 1 && (
+      {active !== "sets" && availableTypes.length > 1 && (
         <div className="filters">
           <button
             type="button"
@@ -113,31 +161,54 @@ export function Browser({ tunes, sets, initialView, canEdit }: Props) {
       )}
 
       <div aria-live="polite" role="status" className="count">
-        {showing} {view === "tunes" ? "tune" : "set"}
-        {showing === 1 ? "" : "s"}
+        {matched.length} {noun}
+        {matched.length === 1 ? "" : "s"}
+        {active === "backlog" && " waiting to be learned"}
       </div>
 
-      {view === "tunes" ? (
-        <TuneList tunes={matchedTunes} empty={tunes.length === 0} />
-      ) : (
+      {active === "sets" ? (
         <SetList sets={matchedSets} tunes={tunes} empty={sets.length === 0} />
+      ) : (
+        <TuneList
+          tunes={active === "backlog" ? matchedBacklog : matchedRepertoire}
+          empty={listed.length === 0}
+          emptyMessage={
+            active === "backlog"
+              ? "Nothing in the backlog. Park a tune here to suggest it to the group."
+              : "No tunes yet. Sign in to add the first one."
+          }
+        />
       )}
 
       {canEdit && (
         <Link
-          href={view === "tunes" ? "/tunes/new" : "/sets/new"}
+          href={
+            active === "sets"
+              ? "/sets/new"
+              : active === "backlog"
+                ? "/tunes/new?status=backlog"
+                : "/tunes/new"
+          }
           className="btn btn-secondary btn-block"
         >
-          + New {view === "tunes" ? "tune" : "set"}
+          {active === "sets" ? "+ New set" : active === "backlog" ? "+ New backlog tune" : "+ New tune"}
         </Link>
       )}
     </div>
   );
 }
 
-function TuneList({ tunes, empty }: { tunes: Tune[]; empty: boolean }) {
+function TuneList({
+  tunes,
+  empty,
+  emptyMessage,
+}: {
+  tunes: Tune[];
+  empty: boolean;
+  emptyMessage: string;
+}) {
   // Distinguish "nothing here yet" from "nothing matched your search".
-  if (empty) return <p className="empty">No tunes yet. Sign in to add the first one.</p>;
+  if (empty) return <p className="empty">{emptyMessage}</p>;
   if (tunes.length === 0) return <p className="empty">No tunes match.</p>;
 
   return (
