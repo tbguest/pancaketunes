@@ -17,6 +17,10 @@ import { TUNE_TYPES, type Tune, type TuneSet, type TuneType } from "@/lib/types"
 
 type View = "tunes" | "sets" | "backlog";
 
+function hrefForView(view: View): string {
+  return view === "tunes" ? "/" : `/?view=${view}`;
+}
+
 type Props = {
   tunes: Tune[];
   sets: TuneSet[];
@@ -71,9 +75,12 @@ export function Browser({ tunes, sets, initialView, canEdit }: Props) {
   }, [listed]);
 
   // A type chosen on one tab rarely makes sense on another, so switching clears it.
+  // replaceState (not the router) keeps the URL in step with the tab so a refresh
+  // opens the same list, without refetching the page or stacking history entries.
   function show(next: View) {
     setView(next);
     setType("all");
+    window.history.replaceState(null, "", hrefForView(next));
   }
 
   const matched =
@@ -98,10 +105,11 @@ export function Browser({ tunes, sets, initialView, canEdit }: Props) {
       <div className="tabs" role="tablist">
         <a
           role="tab"
-          href="#"
+          href={hrefForView("tunes")}
           aria-current={active === "tunes" ? "page" : undefined}
           aria-selected={active === "tunes"}
           onClick={(event) => {
+            if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
             event.preventDefault();
             show("tunes");
           }}
@@ -110,10 +118,11 @@ export function Browser({ tunes, sets, initialView, canEdit }: Props) {
         </a>
         <a
           role="tab"
-          href="#"
+          href={hrefForView("sets")}
           aria-current={active === "sets" ? "page" : undefined}
           aria-selected={active === "sets"}
           onClick={(event) => {
+            if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
             event.preventDefault();
             show("sets");
           }}
@@ -123,10 +132,11 @@ export function Browser({ tunes, sets, initialView, canEdit }: Props) {
         {showBacklog && (
           <a
             role="tab"
-            href="#"
+            href={hrefForView("backlog")}
             aria-current={active === "backlog" ? "page" : undefined}
             aria-selected={active === "backlog"}
             onClick={(event) => {
+              if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
               event.preventDefault();
               show("backlog");
             }}
