@@ -5,13 +5,11 @@
   "type": "jig",
   "key": "G major",
   "status": "backlog",
-  "notes": "Good bridge between The Kesh and Morrison’s.",
-  "tags": [
-    "session"
-  ],
+  "notes": "Set possibility: Out on the ocean - The cliffs of Moher - The rolling wave",
+  "tags": [],
   "links": [],
   "abc": "D0 A1 A1 A0 D3 A1 A3 A1 A0 A1 A0\r\nD3 D1 D0 D3 A0 A1 A1 A0 D3 D1\r\nD0 A1 A1 A0 D3 A1 A3 A1 A0 A1 A0\r\nD3 D1 D0 D3 A0 A1 D3 D2 D3 <- 1st time through\r\nD3 D1 D0 D3 A0 A1 D3 D2 D3 A1 A3 <- 2nd time through\r\n\r\nE0 E2 E0 E0 A3 A1 E0 E2 E0 E0 A3 A1\r\nA3 E0 A3 A3 E0 E1 E2 E1 E0 A3 A1 A0\r\nD3 A0 A1 A3 E0 E2 E0 A3 A1 A0\r\nD3 D1 D0 D3 A0 A1 D3 D2 D3 A1 A3 <- 1st time through\r\nD3 D1 D0 D3 A0 A1 D3 D2 D3 <- 2nd time through",
   "sheetMusicUrl": "https://thesession.org/tunes/108",
   "createdAt": "2026-08-02T10:00:00.000Z",
-  "updatedAt": "2026-08-30T17:26:16.154Z"
+  "updatedAt": "2026-09-03T14:40:55.582Z"
 }
