@@ -6,7 +6,12 @@
   "key": "",
   "status": "repertoire",
   "tags": [],
-  "links": [],
+  "links": [
+    {
+      "label": "",
+      "url": "https://thesession.org/tunes/1357"
+    }
+  ],
   "createdAt": "2026-09-05T23:01:34.908Z",
-  "updatedAt": "2026-09-05T23:01:34.908Z"
+  "updatedAt": "2026-09-05T23:02:17.298Z"
 }
